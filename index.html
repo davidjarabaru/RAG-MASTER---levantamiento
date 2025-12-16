@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Agent Architect Suite v8.0 - RAG SCORING MASTER</title>
+    <title>Baru Rag Master - Suite Inteligente de Agentes IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.min.js"></script>
     <style>
         /* Flowchart Custom Styles */
         .stage-connector { position: absolute; left: 28px; top: 60px; bottom: -30px; width: 3px; background: #e2e8f0; z-index: 0; }
@@ -101,17 +102,99 @@
             border-radius: 6px !important;
             font-weight: 700 !important;
         }
+
+        #welcome-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 40;
+            flex-direction: column;
+        }
+
+        .welcome-content {
+            text-align: center;
+            color: white;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .welcome-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #00b8d4, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-description {
+            font-size: 18px;
+            color: #cbd5e1;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .welcome-features {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 184, 212, 0.2);
+        }
+
+        .welcome-features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .welcome-features li {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .welcome-features i {
+            color: #00b8d4;
+            font-size: 16px;
+            width: 20px;
+        }
+
+        .welcome-button {
+            margin-top: 30px;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #00b8d4, #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 184, 212, 0.3);
+        }
+
+        .welcome-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0, 184, 212, 0.4);
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans h-screen flex overflow-hidden">
 
-    <aside class="sidebar w-72 bg-rag-dark text-white flex flex-col shadow-2xl z-20 transition-all">
+    <aside id="sidebar" class="sidebar w-72 bg-rag-dark text-white flex-col shadow-2xl z-30 transition-transform duration-300 ease-in-out fixed md:relative h-full transform -translate-x-full md:translate-x-0">
         <div class="p-6 border-b border-slate-700 bg-slate-900">
-            <h1 class="text-xl font-bold tracking-wide text-rag-blue"><i class="fa-solid fa-brain mr-2"></i>RAG<span class="font-light text-white">Master</span></h1>
-            <p class="text-xs text-slate-400 mt-1 opacity-80">Arquitectura de Agente Conversacional v8.0</p>
+            <h1 class="text-xl font-bold tracking-wide text-rag-blue"><i class="fa-solid fa-brain mr-2"></i>Baru <span class="font-light text-white">Rag Master</span></h1>
+            <p class="text-xs text-slate-400 mt-1 opacity-80">Suite Inteligente de Agentes IA v8.0</p>
         </div>
         
-        <nav class="flex-1 overflow-y-auto py-4 space-y-1">
+        <nav class="flex-1 overflow-y-auto py-4 space-y-1" onclick="closeSidebarOnMobile()">
             <button onclick="showSection('dashboard', event)" class="nav-btn tab-inactive w-full text-left px-6 py-4 transition-all flex items-center gap-3">
                 <i class="fa-solid fa-chart-line w-5 text-center"></i> 1. Resumen & Persona
             </button>
@@ -136,27 +219,55 @@
         </nav>
     </aside>
 
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+
     <main class="main-content flex-1 overflow-y-auto relative bg-slate-50">
         
-        <header class="sticky top-0 z-10 bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shadow-sm">
-            <div>
-                <h2 id="page-title" class="text-2xl font-bold text-slate-800">Flujo Q&A Detallado</h2>
-                <p id="page-subtitle" class="text-sm text-slate-500">Configuración específica para Flujo Q&A Detallado</p>
+        <header class="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="text-slate-600 md:hidden"><i class="fa-solid fa-bars text-xl"></i></button>
+                <div>
+                    <h2 id="page-title" class="text-xl md:text-2xl font-bold text-slate-800">Flujo Q&A Detallado</h2>
+                    <p id="page-subtitle" class="text-xs md:text-sm text-slate-500">Configuración específica para Flujo Q&A Detallado</p>
+                </div>
             </div>
             <div class="flex gap-3 no-print">
-                <button onclick="window.print()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium border border-slate-300">
-                    <i class="fa-solid fa-print mr-2"></i> Word / PDF
+                <button onclick="exportWord()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium border border-slate-300">
+                    <i class="fa-solid fa-file-word mr-2"></i> Descargar Requerimientos
                 </button>
                 <button onclick="downloadJSON()" class="px-4 py-2 bg-rag-dark text-white rounded-lg text-sm font-medium hover:bg-slate-700 shadow-lg hover:shadow-xl transition-all">
                     <i class="fa-solid fa-download mr-2"></i> Generar JSON
                 </button>
-                    <button onclick="openNuevoRAG()" id="btn-nuevo-rag" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 shadow-md btn-visible-add">
-                        <i class="fa-solid fa-rocket mr-2"></i> Nuevo RAG
-                    </button>
             </div>
         </header>
 
         <div class="p-8 max-w-7xl mx-auto pb-32">
+
+            <!-- Welcome Screen -->
+            <div id="welcome-screen" style="display: none;">
+                <div class="welcome-content">
+                    <div class="welcome-title">
+                        <i class="fa-solid fa-brain"></i> Baru Rag Master
+                    </div>
+                    <div class="welcome-description">
+                        <strong>Suite Inteligente para Arquitectura de Agentes de IA</strong>
+                        <p style="margin-top: 15px; font-size: 16px;">Diseña, configura y despliega agentes conversacionales potentes sin necesidad de código</p>
+                    </div>
+                    <div class="welcome-features">
+                        <ul>
+                            <li><i class="fa-solid fa-route"></i> Define flujos conversacionales complejos</li>
+                            <li><i class="fa-solid fa-database"></i> Configura tu base de conocimiento RAG</li>
+                            <li><i class="fa-solid fa-star"></i> Implementa sistemas de scoring avanzados</li>
+                            <li><i class="fa-solid fa-code"></i> Exporta configuraciones en JSON</li>
+                            <li><i class="fa-solid fa-rocket"></i> Integra con cualquier plataforma</li>
+                        </ul>
+                    </div>
+                    <button onclick="openNuevoRAG()" class="welcome-button">
+                        <i class="fa-solid fa-rocket mr-2"></i> Comenzar con Nuevo RAG
+                    </button>
+                </div>
+            </div>
 
             <!-- Nuevo RAG Modal / Wizard -->
             <div id="nuevo-rag-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
@@ -197,7 +308,6 @@
                         </div>
                         <div class="flex gap-2">
                             <button id="nr-next" onclick="nextWizardStep()" class="px-4 py-2 rounded bg-emerald-600 text-white">Siguiente</button>
-                            <button id="nr-skip" onclick="finishWizard(true)" class="px-4 py-2 rounded bg-slate-200 text-slate-700">Saltar</button>
                         </div>
                     </div>
                 </div>
@@ -209,16 +319,16 @@
                     <h3 class="font-bold text-lg border-b pb-2 mb-4">Contexto y Persona General</h3>
                     <div class="grid grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-slate-600 mb-1">Empresa / Producto</label>
-                            <input type="text" id="clientName" class="w-full p-2 border rounded focus:ring-2 focus:ring-rag-blue outline-none" placeholder="Ej: Venta de autos eléctricos BYD">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Empresa / Producto</label>
+                            <input type="text" id="clientName" class="w-full p-2 border rounded focus:ring-2 focus:ring-rag-blue outline-none text-slate-900" placeholder="Ej: Venta de autos eléctricos BYD" oninput="SessionManager.autoSave('clientName', this.value)">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-600 mb-1">Nombre y Rol del Agente</label>
-                            <input type="text" id="agentName" class="w-full p-2 border rounded focus:ring-2 focus:ring-rag-blue outline-none" value="Sofía, Agente Setter" placeholder="Ej: Sofía, Asesora Virtual">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Nombre y Rol del Agente</label>
+                            <input type="text" id="agentName" class="w-full p-2 border rounded focus:ring-2 focus:ring-rag-blue outline-none text-slate-900" value="Sofía, Agente Setter" placeholder="Ej: Sofía, Asesora Virtual" oninput="SessionManager.autoSave('agentName', this.value)">
                         </div>
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-slate-600 mb-1">System Prompt Base (Tonalidad y Reglas de Comportamiento)</label>
-                            <textarea id="basePrompt" rows="4" class="w-full p-3 border rounded text-sm font-mono bg-slate-50 focus:bg-white focus:ring-2 focus:ring-rag-blue outline-none" placeholder="Define aquí el tono, límites éticos y objetivos macro..."></textarea>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">System Prompt Base (Tonalidad y Reglas de Comportamiento)</label>
+                            <textarea id="basePrompt" rows="4" class="w-full p-3 border rounded text-sm font-mono bg-slate-50 focus:bg-white focus:ring-2 focus:ring-rag-blue outline-none text-slate-900" placeholder="Define aquí el tono, límites éticos y objetivos macro..." oninput="SessionManager.autoSave('basePrompt', this.value)"></textarea>
                         </div>
                     </div>
                     <!-- Botón genérico de ejemplo, aunque esta sección es de inputs -->
@@ -232,7 +342,7 @@
 
             <div id="flow" class="section-panel">
                 <div class="mb-6 flex justify-between items-center">
-                    <div>
+                    <div class="flex-1">
                         <h3 class="text-xl font-bold text-slate-800">Mapa del Journey y Q&A de Camino Crítico</h3>
                         <p class="text-sm text-slate-500">Define el rol y los pasos conversacionales exactos para la **ruta feliz**. **Cada sección de Q&A se puede expandir y contraer dinámicamente.**</p>
                     </div>
@@ -278,7 +388,7 @@
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <h3 class="text-lg font-bold text-slate-800 mb-4">Instrucciones Específicas del Módulo RAG</h3>
                     <label class="block text-sm font-medium text-slate-600 mb-1">RAG System Prompt Adicional</label>
-                    <textarea id="ragPrompt" rows="4" class="w-full p-3 border rounded text-sm font-mono bg-slate-900 text-green-400 focus:outline-none" placeholder="Instrucciones para el motor de respuestas."></textarea>
+                    <textarea id="ragPrompt" rows="4" class="w-full p-3 border rounded text-sm font-mono bg-slate-900 text-green-400 focus:outline-none" placeholder="Instrucciones para el motor de respuestas." oninput="SessionManager.autoSave('ragPrompt', this.value)"></textarea>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
@@ -377,6 +487,85 @@
     </main>
 
 <script>
+    // --- SESSION MANAGEMENT SYSTEM ---
+    let currentSessionId = null;
+    const STORAGE_KEY = 'baru_sessions';
+    const SESSION_DATA_KEY = 'baru_session_data_';
+    
+    function generateSessionId() {
+        return 'sess_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    }
+    
+    function initSession() {
+        const savedSessionId = sessionStorage.getItem('currentSessionId');
+        
+        if (savedSessionId) {
+            currentSessionId = savedSessionId;
+            loadSessionData();
+        } else {
+            currentSessionId = generateSessionId();
+            sessionStorage.setItem('currentSessionId', currentSessionId);
+            saveSessionMetadata();
+        }
+    }
+    
+    function saveSessionMetadata() {
+        const sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        sessions[currentSessionId] = {
+            created: new Date().toISOString(),
+            lastModified: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+    }
+    
+    function autoSaveField(fieldId, value) {
+        const key = SESSION_DATA_KEY + currentSessionId;
+        const data = JSON.parse(localStorage.getItem(key) || '{}');
+        data[fieldId] = value;
+        data._lastModified = new Date().toISOString();
+        localStorage.setItem(key, JSON.stringify(data));
+        saveSessionMetadata();
+    }
+    
+    function loadSessionData() {
+        const key = SESSION_DATA_KEY + currentSessionId;
+        const data = JSON.parse(localStorage.getItem(key) || '{}');
+        
+        for (const [fieldId, value] of Object.entries(data)) {
+            if (fieldId === '_lastModified') continue;
+            
+            const element = document.getElementById(fieldId);
+            if (element && typeof value === 'string') {
+                element.value = value;
+            }
+        }
+    }
+    
+    function getSessionData() {
+        const key = SESSION_DATA_KEY + currentSessionId;
+        return JSON.parse(localStorage.getItem(key) || '{}');
+    }
+    
+    function getAllSessions() {
+        const sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        return sessions;
+    }
+    
+    function deleteSession(sessionId) {
+        const sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        delete sessions[sessionId];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
+        const key = SESSION_DATA_KEY + sessionId;
+        localStorage.removeItem(key);
+    }
+    
+    function clearAllSessions() {
+        const sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        for (const sessionId of Object.keys(sessions)) {
+            deleteSession(sessionId);
+        }
+    }
+
     // --- DEFAULT DATA MODELS (ACTUALIZADOS CON INFO DEL WORD) ---
     
     // Global Checkpoints (Scoring Global)
@@ -584,19 +773,19 @@
             <div class="grid grid-cols-3 gap-3">
                 <div class="col-span-3">
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pregunta del Agente (Editable)</label>
-                    <input type="text" class="w-full p-2 text-sm border rounded" placeholder="Ej: ¿Cuál es tu presupuesto?" value="${q}">
+                    <input type="text" class="qa-question w-full p-2 text-sm border rounded text-slate-900" placeholder="Ej: ¿Cuál es tu presupuesto?" value="${q}" style="font-size: 0.875rem;">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Respuesta Esperada / Intención</label>
-                    <input type="text" class="w-full p-2 text-sm border rounded" value="${a}" placeholder="Ej: {budget_range} capturado">
+                    <input type="text" class="qa-answer w-full p-2 text-sm border rounded text-slate-900" value="${a}" placeholder="Ej: {budget_range} capturado" style="font-size: 0.875rem;">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-blue-600 uppercase mb-1">Entidades a Capturar (Separar con coma)</label>
-                    <input type="text" class="w-full p-2 text-sm border rounded" value="${entities}" placeholder="Ej: budget_range, timeline">
+                    <input type="text" class="qa-entities w-full p-2 text-sm border rounded text-slate-900" value="${entities}" placeholder="Ej: budget_range, timeline" style="font-size: 0.875rem;">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-green-600 uppercase mb-1">Activa Checkpoint (CP)</label>
-                    <input type="text" class="w-full p-2 text-sm border rounded bg-green-50" value="${cp}" placeholder="Ej: CP3">
+                    <input type="text" class="qa-cp w-full p-2 text-sm border rounded bg-green-50 text-slate-900" value="${cp}" placeholder="Ej: CP3" style="font-size: 0.875rem;">
                 </div>
             </div>
         `;
@@ -626,23 +815,23 @@
                 <div class="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200 grid grid-cols-3 gap-3 text-sm">
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">1. Alcance / Scopo</label>
-                        <input type="text" value="${s.scope || ''}" class="w-full p-1 text-sm rounded bg-white border" id="scope-${s.code}">
+                        <input type="text" value="${s.scope || ''}" class="w-full p-1 text-sm rounded bg-white border text-slate-900" id="scope-${s.code}">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">2. Objetivo Principal</label>
-                        <input type="text" value="${s.objective || ''}" class="w-full p-1 text-sm rounded bg-white border" id="objective-${s.code}">
+                        <input type="text" value="${s.objective || ''}" class="w-full p-1 text-sm rounded bg-white border text-slate-900" id="objective-${s.code}">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase mb-1">3. Base de Datos</label>
-                        <input type="text" value="${s.database || 'N/A'}" class="w-full p-1 text-sm rounded bg-white border" id="database-${s.code}">
+                        <input type="text" value="${s.database || 'N/A'}" class="w-full p-1 text-sm rounded bg-white border text-slate-900" id="database-${s.code}">
                     </div>
 
                     <div class="col-span-3 mt-3">
                         <div id="custom-fields-${s.code}" class="space-y-2">
                             ${(s.custom_fields || []).map((f, idx) => `
-                                <div class="grid grid-cols-6 gap-2 items-center">
-                                    <div class="col-span-2 text-xs text-slate-600 font-medium">${f.label}</div>
-                                    <div class="col-span-4"><input id="custom-${s.code}-${f.key}" type="text" value="${f.value||''}" class="w-full p-1 text-sm rounded bg-white border custom-field-input" placeholder="${f.placeholder||''}"></div>
+                                <div class="grid grid-cols-3 gap-2 items-center">
+                                    <div class="col-span-1 text-sm text-slate-600 font-medium">${f.label}</div>
+                                    <div class="col-span-2"><input id="custom-${s.code}-${f.key}" type="text" value="${f.value||''}" class="w-full p-1 text-sm rounded bg-white border custom-field-input text-slate-900" placeholder="${f.placeholder||''}"></div>
                                 </div>
                             `).join('')}
                         </div>
@@ -670,9 +859,9 @@
                     <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 space-y-3">
                         <h5 class="text-sm font-bold text-blue-700"><i class="fa-solid fa-code-branch mr-1"></i> CONFIGURACIÓN RAG</h5>
                         <label class="block text-xs font-bold text-blue-600 uppercase">⚠️ Pre-Condición RAG</label>
-                        <input type="text" class="w-full p-2 text-sm border rounded" placeholder="Ej: Scoring Entidad > 40" id="rag-precondition-${s.code}" value="${s.rag_config.pre_condition}">
+                        <input type="text" class="w-full p-2 text-sm border rounded text-slate-900" placeholder="Ej: Scoring Entidad > 40" id="rag-precondition-${s.code}" value="${s.rag_config.pre_condition}">
                         <label class="block text-xs font-bold text-blue-600 uppercase mt-2">⚙️ Estrategia de Consulta</label>
-                        <input type="text" class="w-full p-2 text-sm border rounded" placeholder="Ej: Semantic Search, Max Chunks: 3, Temp: 0.2" id="rag-strategy-${s.code}" value="${s.rag_config.strategy}">
+                        <input type="text" class="w-full p-2 text-sm border rounded text-slate-900" placeholder="Ej: Semantic Search, Max Chunks: 3, Temp: 0.2" id="rag-strategy-${s.code}" value="${s.rag_config.strategy}">
                     </div>
                 ` : '';
 
@@ -760,22 +949,24 @@
 
             return `
             <div class="stage-card relative pl-14 pb-12 group" id="stage-${s.code}">
-                <div class="stage-connector"></div>
+                <div class="stage-connector hidden md:block"></div>
                 <div class="absolute left-0 top-0 w-14 h-14 flex items-center justify-center">
                     <div class="w-10 h-10 rounded-full bg-${s.color}-100 border-2 border-${s.color}-500 text-${s.color}-700 font-bold flex items-center justify-center shadow-sm z-10">
                         ${s.code}
                     </div>
                 </div>
-
+    
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all relative">
                     <h4 class="text-lg font-bold text-slate-800">${s.title}</h4>
-                    <div class="flex items-center space-x-2 mt-1 mb-2">
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-${s.color}-100 text-${s.color}-800 uppercase">Rol: ${s.role}</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded bg-orange-50 text-orange-600">KPI Objetivo: ${s.kpi}</span>
-                        <span class="text-xs text-slate-500 font-medium">Tiempo Máx:</span>
-                        <input type="text" value="${s.time_limit}" class="text-xs p-1 rounded border w-32 text-center bg-slate-50" id="time-limit-${s.code}">
+                    <div class="flex items-center space-x-2 mt-1 mb-2 text-xs">
+                        <label for="role-${s.code}" class="font-medium text-slate-600">Rol:</label>
+                        <input type="text" id="role-${s.code}" value="${s.role}" class="p-1 border rounded w-40 bg-slate-50 text-slate-900" style="font-size: 0.875rem;">
+                        <label for="kpi-${s.code}" class="font-medium text-slate-600 ml-3">KPI Objetivo:</label>
+                        <input type="text" id="kpi-${s.code}" value="${s.kpi}" class="p-1 border rounded w-40 bg-slate-50 text-slate-900" style="font-size: 0.875rem;">
+                        <label for="time-limit-${s.code}" class="font-medium text-slate-600 ml-3">Tiempo Máx:</label>
+                        <input type="text" id="time-limit-${s.code}" value="${s.time_limit}" class="p-1 border rounded w-24 text-center bg-slate-50 text-slate-900" style="font-size: 0.875rem;">
                     </div>
-                    
+                        
                     ${metadataBlock}
 
                     <div class="mt-4 space-y-4">
@@ -811,94 +1002,7 @@
         });
     }
 
-    // --- Nuevo RAG / Wizard Logic ---
-    let nr_currentStep = 1;
 
-    function openNuevoRAG() {
-        document.getElementById('nuevo-rag-modal').classList.remove('hidden');
-        nr_currentStep = 1;
-        showWizardStep(nr_currentStep);
-    }
-
-    function closeNuevoRAG() {
-        document.getElementById('nuevo-rag-modal').classList.add('hidden');
-    }
-
-    function showWizardStep(n) {
-        document.querySelectorAll('#nuevo-rag-steps .step').forEach(el => el.classList.add('hidden'));
-        const el = document.querySelector(`#nuevo-rag-steps .step[data-step='${n}']`);
-        if (el) el.classList.remove('hidden');
-        // prev/next visibility
-        document.getElementById('nr-prev').classList.toggle('hidden', n===1);
-        document.getElementById('nr-next').innerText = (n===3) ? 'Finalizar' : 'Siguiente';
-    }
-
-    function nextWizardStep() {
-        if (nr_currentStep === 1) {
-            const user = document.getElementById('nr_user').value.trim();
-            const project = document.getElementById('nr_project').value.trim();
-            if (!user || !project) {
-                alert('Por favor ingrese Usuario y Proyecto para continuar.');
-                return;
-            }
-            // save to global (temporary)
-            window._nuevoRAG = { user: user, project: project };
-        }
-        if (nr_currentStep < 3) nr_currentStep++;
-        else { finishWizard(false); return; }
-        showWizardStep(nr_currentStep);
-    }
-
-    function prevWizardStep() {
-        if (nr_currentStep > 1) nr_currentStep--;
-        showWizardStep(nr_currentStep);
-    }
-
-    function finishWizard(skipConfirm) {
-        // If skipped, allow still to set basic user if present
-        if (!window._nuevoRAG) {
-            const u = document.getElementById('nr_user').value.trim();
-            const p = document.getElementById('nr_project').value.trim();
-            if (u && p) window._nuevoRAG = { user: u, project: p };
-        }
-        if (!window._nuevoRAG) {
-            if (!skipConfirm) { alert('No se guardó la información del usuario.'); return; }
-        }
-        // Persist into page state
-        if (window._nuevoRAG) {
-            document.getElementById('clientName').value = window._nuevoRAG.project;
-            document.getElementById('agentName').value = window._nuevoRAG.user;
-        }
-        enableAllInteractiveFields();
-        closeNuevoRAG();
-        // small toast
-        console.info('Nuevo RAG iniciado por', window._nuevoRAG);
-    }
-
-    // Disable/Enable all interactive fields to force identification first
-    function disableAllInteractiveFields() {
-        const selectors = 'input, textarea, select, button';
-        document.querySelectorAll(selectors).forEach(el => {
-            // keep Nuevo RAG and nav buttons enabled
-            if (el.id === 'btn-nuevo-rag' || el.closest('#nuevo-rag-modal') || el.classList.contains('nav-btn') || el.onclick && String(el.onclick).includes('showSection')) {
-                return;
-            }
-            // allow section nav buttons
-            if (el.classList && el.classList.contains('nav-btn')) return;
-            // allow JSON download and print
-            if (el.onclick && (String(el.onclick).includes('downloadJSON') || String(el.onclick).includes('window.print'))) return;
-            // Mark disabled visually and set disabled
-            try { el.dataset._wasDisabled = el.disabled ? '1' : '0'; el.disabled = true; }
-            catch(e){}
-        });
-    }
-
-    function enableAllInteractiveFields() {
-        document.querySelectorAll('input, textarea, select, button').forEach(el => {
-            if (el.id === 'btn-nuevo-rag' || el.closest('#nuevo-rag-modal')) return;
-            try { el.disabled = false; } catch(e){}
-        });
-    }
 
     // Function to add a new generic stage
     function addStage() {
@@ -935,10 +1039,10 @@
         tbodyEnt.innerHTML = entities.map((e, index) => `
             <tr>
                 <td class="p-3 border-b"><input type="text" value="${e.key}" class="w-full bg-transparent outline-none font-mono text-blue-600"></td>
-                <td class="p-3 border-b"><select class="bg-transparent"><option ${e.type=='String'?'selected':''}>String</option><option ${e.type=='Number'?'selected':''}>Number</option><option ${e.type=='Date'?'selected':''}>Date</option><option ${e.type=='NumberRange'?'selected':''}>NumberRange</option></select></td>
-                <td class="p-3 border-b"><input type="text" value="${e.validation}" class="w-full bg-transparent outline-none text-sm"></td>
-                <td class="p-3 border-b text-center"><input type="number" value="${e.score}" class="w-16 bg-blue-50 text-blue-700 text-center rounded px-2 font-bold"></td>
-                <td class="p-3 border-b"><input type="text" value="${e.required_in}" class="w-16 bg-slate-100 rounded px-2 text-center"></td>
+                <td class="p-3 border-b"><select class="bg-transparent text-slate-900"><option ${e.type=='String'?'selected':''}>String</option><option ${e.type=='Number'?'selected':''}>Number</option><option ${e.type=='Date'?'selected':''}>Date</option><option ${e.type=='NumberRange'?'selected':''}>NumberRange</option></select></td>
+                <td class="p-3 border-b"><input type="text" value="${e.validation}" class="w-full bg-transparent outline-none text-sm text-slate-900"></td>
+                <td class="p-3 border-b text-center"><input type="number" value="${e.score}" class="w-16 bg-blue-50 text-blue-800 text-center rounded px-2 font-bold"></td>
+                <td class="p-3 border-b"><input type="text" value="${e.required_in}" class="w-16 bg-slate-100 rounded px-2 text-center text-slate-900"></td>
                 <td class="p-3 border-b"><button class="text-red-400 hover:text-red-600 no-print btn-visible-remove" onclick="this.closest('tr').remove()">×</button></td>
             </tr>
         `).join('');
@@ -949,9 +1053,9 @@
         const tbodySrc = document.querySelector('#sourcesTable tbody');
         tbodySrc.innerHTML = sources.map((s, index) => `
             <tr>
-                <td class="p-3 border-b"><input type="text" value="${s.name}" class="w-full bg-transparent outline-none font-bold"></td>
-                <td class="p-3 border-b"><input type="text" value="${s.type} / ${s.url}" class="w-full bg-transparent outline-none text-sm font-mono"></td>
-                <td class="p-3 border-b"><select class="bg-slate-50 rounded"><option ${s.priority=='Alta'?'selected':''}>Alta</option><option ${s.priority=='Media'?'selected':''}>Media</option><option ${s.priority=='Baja'?'selected':''}>Baja</option></select></td>
+                <td class="p-3 border-b"><input type="text" value="${s.name}" class="w-full bg-transparent outline-none font-bold text-slate-900"></td>
+                <td class="p-3 border-b"><input type="text" value="${s.type} / ${s.url}" class="w-full bg-transparent outline-none text-sm font-mono text-slate-900"></td>
+                <td class="p-3 border-b"><select class="bg-slate-50 rounded text-slate-900"><option ${s.priority=='Alta'?'selected':''}>Alta</option><option ${s.priority=='Media'?'selected':''}>Media</option><option ${s.priority=='Baja'?'selected':''}>Baja</option></select></td>
                 <td class="p-3 border-b"><button class="text-red-400 hover:text-red-600 no-print btn-visible-remove" onclick="this.closest('tr').remove()">×</button></td>
             </tr>
         `).join('');
@@ -962,10 +1066,10 @@
         const tbodyScore = document.getElementById('scoring-tbody');
         tbodyScore.innerHTML = checkpoints.map((cp, index) => `
             <tr class="hover:bg-slate-50 border-b border-slate-100">
-                <td class="p-4 font-mono text-xs font-bold text-slate-500"><input type="text" value="${cp.id}" class="w-10 bg-slate-100 text-center rounded"></td>
-                <td class="p-4 text-slate-700 font-medium"><input type="text" value="${cp.desc}" class="w-full bg-transparent"></td>
-                <td class="p-4"><input type="text" value="${cp.stage}" class="w-16 bg-slate-100 text-center rounded"></td>
-                <td class="p-4 text-right"><input type="number" value="${cp.score}" class="w-16 bg-blue-50 text-blue-700 text-center rounded font-bold"></td>
+                <td class="p-4 font-mono text-xs font-bold text-slate-500"><input type="text" value="${cp.id}" class="w-10 bg-slate-100 text-center rounded text-slate-900"></td>
+                <td class="p-4 text-slate-700 font-medium"><input type="text" value="${cp.desc}" class="w-full bg-transparent text-slate-900"></td>
+                <td class="p-4"><input type="text" value="${cp.stage}" class="w-16 bg-slate-100 text-center rounded text-slate-900"></td>
+                <td class="p-4 text-right"><input type="number" value="${cp.score}" class="w-16 bg-blue-50 text-blue-800 text-center rounded font-bold"></td>
                 <td class="p-4"><button class="text-red-400 hover:text-red-600 no-print btn-visible-remove" onclick="this.closest('tr').remove()">×</button></td>
             </tr>
         `).join('');
@@ -976,11 +1080,11 @@
         const tbodyQA = document.querySelector('#qaLibraryTable tbody');
         tbodyQA.innerHTML = qaLibrary.map((qa, index) => `
             <tr>
-                <td class="p-3 border-b"><input type="text" value="${qa.q}" class="w-full bg-transparent outline-none font-bold"></td>
-                <td class="p-3 border-b"><input type="text" value="${qa.a}" class="w-full bg-transparent outline-none text-sm"></td>
-                <td class="p-3 border-b text-center"><input type="number" value="${qa.score}" class="w-16 bg-blue-50 text-blue-700 text-center rounded px-2 font-bold"></td>
+                <td class="p-3 border-b"><input type="text" value="${qa.q}" class="w-full bg-transparent outline-none font-bold text-slate-900"></td>
+                <td class="p-3 border-b"><input type="text" value="${qa.a}" class="w-full bg-transparent outline-none text-sm text-slate-900"></td>
+                <td class="p-3 border-b text-center"><input type="number" value="${qa.score}" class="w-16 bg-blue-50 text-blue-800 text-center rounded px-2 font-bold"></td>
                 <td class="p-3 border-b">
-                    <select class="bg-slate-50 rounded">
+                    <select class="bg-slate-50 rounded text-slate-900">
                         <option value="E1" ${qa.stage=='E1'?'selected':''}>E1 - Validador</option>
                         <option value="E2" ${qa.stage=='E2'?'selected':''}>E2 - Consultor</option>
                         <option value="E3" ${qa.stage=='E3'?'selected':''}>E3 - Agendador</option>
@@ -1093,10 +1197,10 @@
 
             const stageData = {
                 code: s.code,
-                role: s.role,
-                kpi_objective: s.kpi, 
+                role: document.getElementById(`role-${s.code}`)?.value || s.role,
+                kpi_objective: document.getElementById(`kpi-${s.code}`)?.value || s.kpi, 
                 // Capture the time limit field
-                time_limit: document.getElementById(`time-limit-${s.code}`) ? document.getElementById(`time-limit-${s.code}`).value : s.time_limit,
+                time_limit: document.getElementById(`time-limit-${s.code}`)?.value || s.time_limit,
                 
                 // Capture new metadata fields
                 scope: document.getElementById(`scope-${s.code}`).value,
@@ -1175,32 +1279,632 @@
     }
 
     function downloadJSON() {
-        const data = updateJsonPreview();
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+        const sessionData = getSessionData();
+        const clientName = document.getElementById('clientName').value || sessionData.clientName || 'Proyecto RAG';
+        const agentName = document.getElementById('agentName').value || sessionData.agentName || 'Agente IA';
+        const basePrompt = document.getElementById('basePrompt').value || sessionData.basePrompt || '';
+        const ragPrompt = document.getElementById('ragPrompt').value || sessionData.ragPrompt || '';
+        
+        const scrapedEntities = [];
+        document.querySelectorAll('#entitiesTable tbody tr').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 5) {
+                scrapedEntities.push({
+                    key: cells[0].querySelector('input')?.value || '',
+                    type: cells[1].querySelector('select')?.value || '',
+                    validation: cells[2].querySelector('input')?.value || '',
+                    score: parseInt(cells[3].querySelector('input')?.value) || 0,
+                    required_in: cells[4].querySelector('input')?.value || ''
+                });
+            }
+        });
+
+        const scrapedSources = [];
+        document.querySelectorAll('#sourcesTable tbody tr').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 3) {
+                scrapedSources.push({
+                    name: cells[0].querySelector('input')?.value || '',
+                    type: cells[1].querySelector('input')?.value || '',
+                    priority: cells[2].querySelector('select')?.value || ''
+                });
+            }
+        });
+
+        const scrapedCheckpoints = [];
+        document.querySelectorAll('#scoring-tbody tr').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 4) {
+                scrapedCheckpoints.push({
+                    id: cells[0].querySelector('input')?.value || '',
+                    desc: cells[1].querySelector('input')?.value || '',
+                    stage: cells[2].querySelector('input')?.value || '',
+                    score: parseInt(cells[3].querySelector('input')?.value) || 0
+                });
+            }
+        });
+
+        const scrapedQALibrary = [];
+        document.querySelectorAll('#qaLibraryTable tbody tr').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 5) {
+                scrapedQALibrary.push({
+                    q: cells[0].querySelector('input')?.value || '',
+                    a: cells[1].querySelector('input')?.value || '',
+                    score: parseInt(cells[2].querySelector('input')?.value) || 0,
+                    stage: cells[3].querySelector('input')?.value || ''
+                });
+            }
+        });
+
+        const scrapedStages = stages.map(s => {
+            const qaSteps = [];
+            document.querySelectorAll(`#qa-container-${s.code} .qa-step-card`).forEach(card => {
+                const qInput = card.querySelector('.qa-question');
+                const aInput = card.querySelector('.qa-answer');
+                if (qInput && aInput) {
+                    qaSteps.push({
+                        q: qInput.value,
+                        a: aInput.value,
+                        entities_to_capture: card.querySelector('.qa-entities')?.value?.split(',').map(e => e.trim()) || [],
+                        cp_trigger: card.querySelector('.qa-cp')?.value || ''
+                    });
+                }
+            });
+
+            return {
+                code: s.code,
+                role: s.role,
+                kpi_objective: s.kpi,
+                time_limit: document.getElementById(`time-limit-${s.code}`)?.value || s.time_limit,
+                scope: document.getElementById(`scope-${s.code}`)?.value || s.scope,
+                objective: document.getElementById(`objective-${s.code}`)?.value || s.objective,
+                database: document.getElementById(`database-${s.code}`)?.value || s.database,
+                system_prompt: document.getElementById(`prompt-${s.code}`)?.value || s.prompt,
+                qa_flow: qaSteps
+            };
+        });
+
+        const config = {
+            sessionId: currentSessionId,
+            project: clientName,
+            agent_name: agentName,
+            version: "8.0-RAG-Scoring-Master",
+            last_updated: new Date().toISOString(),
+            system_prompt_base: basePrompt,
+            
+            scoring_module: {
+                logic: "TOTAL = SUM(Entity Scores) + SUM(Response Scores) + SUM(Checkpoint Scores)",
+                entity_scoring: scrapedEntities,
+                response_scoring_library: scrapedQALibrary,
+                global_checkpoints: scrapedCheckpoints
+            },
+
+            journey_stages: scrapedStages,
+
+            rag_config: {
+                rag_system_prompt: ragPrompt,
+                knowledge_sources: scrapedSources
+            }
+        };
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(config, null, 2));
         const a = document.createElement('a');
         a.href = dataStr;
-        a.download = `rag_agent_config_${document.getElementById('clientName').value.replace(/\s+/g, '_')}_v8.json`;
+        
+        const filename = `Requerimientos_${clientName.replace(/\s+/g, '_')}_${currentSessionId}.json`.substring(0, 80);
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         a.remove();
     }
 
+    function exportWord() {
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel, PageBreak, Table, TableCell, TableRow, BorderStyle, VerticalAlign, AlignmentType, UnderlineType } = window.docx;
+        
+        const clientName = document.getElementById('clientName').value || 'Proyecto RAG';
+        const agentName = document.getElementById('agentName').value || 'Agente IA';
+        const basePrompt = document.getElementById('basePrompt').value || '';
+        const ragPrompt = document.getElementById('ragPrompt').value || '';
+        
+        const sections = [];
+        const timestamp = new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+        
+        sections.push(
+            new Paragraph({
+                text: 'ESPECIFICACIÓN DE REQUERIMIENTOS FUNCIONALES',
+                heading: HeadingLevel.HEADING_1,
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 50, before: 0 },
+                bold: true
+            }),
+            new Paragraph({
+                text: 'AGENTE CONVERSACIONAL IA - SISTEMA RAG',
+                heading: HeadingLevel.HEADING_2,
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 300 }
+            })
+        );
+        
+        sections.push(
+            new Paragraph({
+                text: '1. INFORMACIÓN GENERAL DEL PROYECTO',
+                heading: HeadingLevel.HEADING_1,
+                spacing: { before: 200, after: 150 },
+                border: { bottom: { color: '00b8d4', space: 1, style: BorderStyle.SINGLE, size: 6 } }
+            }),
+            new Paragraph({
+                text: `Empresa / Producto: ${clientName}`,
+                spacing: { after: 100 },
+                bullet: { level: 0 }
+            }),
+            new Paragraph({
+                text: `Nombre del Agente IA: ${agentName}`,
+                spacing: { after: 100 },
+                bullet: { level: 0 }
+            }),
+            new Paragraph({
+                text: `Versión: 8.0 - RAG Scoring Master`,
+                spacing: { after: 100 },
+                bullet: { level: 0 }
+            }),
+            new Paragraph({
+                text: `Fecha de Generación: ${timestamp}`,
+                spacing: { after: 200 },
+                bullet: { level: 0 }
+            })
+        );
+        
+        sections.push(
+            new Paragraph({
+                text: '2. DESCRIPCIÓN Y OBJETIVO GENERAL',
+                heading: HeadingLevel.HEADING_1,
+                spacing: { before: 200, after: 150 },
+                border: { bottom: { color: '00b8d4', space: 1, style: BorderStyle.SINGLE, size: 6 } }
+            }),
+            new Paragraph({
+                text: 'Objetivo del Agente:',
+                heading: HeadingLevel.HEADING_3,
+                spacing: { after: 100 }
+            }),
+            new Paragraph({
+                text: basePrompt || '(No definido)',
+                spacing: { after: 200 },
+                italics: true
+            })
+        );
+        
+        sections.push(
+            new Paragraph({
+                text: '3. CONFIGURACIÓN RAG (RETRIEVAL-AUGMENTED GENERATION)',
+                heading: HeadingLevel.HEADING_1,
+                spacing: { before: 200, after: 150 },
+                border: { bottom: { color: '00b8d4', space: 1, style: BorderStyle.SINGLE, size: 6 } }
+            }),
+            new Paragraph({
+                text: 'Instrucciones del Motor RAG:',
+                heading: HeadingLevel.HEADING_3,
+                spacing: { after: 100 }
+            }),
+            new Paragraph({
+                text: ragPrompt || '(No definidas)',
+                spacing: { after: 200 },
+                italics: true
+            })
+        );
+        
+        const sourcesTable = [];
+        sourcesTable.push(
+            new TableRow({
+                children: [
+                    new TableCell({ children: [new Paragraph({ text: 'Nombre de Fuente', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Tipo / URL', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Prioridad', bold: true })], shading: { fill: 'e2e8f0' } })
+                ]
+            })
+        );
+        
+        document.querySelectorAll('#sourcesTable tbody tr').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 3) {
+                sourcesTable.push(
+                    new TableRow({
+                        children: [
+                            new TableCell({ children: [new Paragraph(cells[0].querySelector('input')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[1].querySelector('input')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[2].querySelector('select')?.value || '')] })
+                        ]
+                    })
+                );
+            }
+        });
+        
+        if (sourcesTable.length > 1) {
+            sections.push(
+                new Table({ rows: sourcesTable, width: { size: 100, type: 'pct' } }),
+                new Paragraph({ text: '', spacing: { after: 200 } })
+            );
+        }
+        
+        sections.push(new PageBreak());
+        
+        sections.push(
+            new Paragraph({
+                text: '4. ETAPAS DEL JOURNEY CONVERSACIONAL',
+                heading: HeadingLevel.HEADING_1,
+                spacing: { before: 200, after: 150 },
+                border: { bottom: { color: '00b8d4', space: 1, style: BorderStyle.SINGLE, size: 6 } }
+            })
+        );
+        
+        stages.forEach((stage, idx) => {
+            const timeLimitEl = document.getElementById(`time-limit-${stage.code}`);
+            const timeLimit = timeLimitEl ? timeLimitEl.value : stage.time_limit;
+            
+            sections.push(
+                new Paragraph({
+                    text: `${stage.code}. ${stage.title}`,
+                    heading: HeadingLevel.HEADING_2,
+                    spacing: { before: 200, after: 100 }
+                }),
+                new Paragraph({
+                    text: `Rol: ${stage.role}`,
+                    spacing: { after: 50 },
+                    bullet: { level: 0 }
+                }),
+                new Paragraph({
+                    text: `KPI Objetivo: ${stage.kpi}`,
+                    spacing: { after: 50 },
+                    bullet: { level: 0 }
+                }),
+                new Paragraph({
+                    text: `Tiempo Máximo: ${timeLimit}`,
+                    spacing: { after: 50 },
+                    bullet: { level: 0 }
+                }),
+                new Paragraph({
+                    text: `Objetivo: ${document.getElementById(`objective-${stage.code}`)?.value || stage.objective || ''}`,
+                    spacing: { after: 100 },
+                    bullet: { level: 0 }
+                }),
+                new Paragraph({
+                    text: 'Flujo Conversacional:',
+                    heading: HeadingLevel.HEADING_3,
+                    spacing: { after: 100 }
+                })
+            );
+            
+            document.querySelectorAll(`#qa-container-${stage.code} .qa-step-card`).forEach((card, qIdx) => {
+                const qInput = card.querySelector('.qa-question');
+                const aInput = card.querySelector('.qa-answer');
+                const question = qInput ? qInput.value : '';
+                const answer = aInput ? aInput.value : '';
+                
+                sections.push(
+                    new Paragraph({
+                        text: `P${qIdx + 1}: ${question}`,
+                        spacing: { after: 50 },
+                        italics: true
+                    }),
+                    new Paragraph({
+                        text: `R${qIdx + 1}: ${answer}`,
+                        spacing: { after: 100 }
+                    })
+                );
+            });
+        });
+        
+        sections.push(new PageBreak());
+        
+        sections.push(
+            new Paragraph({
+                text: '5. ENTIDADES Y SCORING POR ENTIDAD',
+                heading: HeadingLevel.HEADING_1,
+                spacing: { before: 200, after: 150 },
+                border: { bottom: { color: '00b8d4', space: 1, style: BorderStyle.SINGLE, size: 6 } }
+            })
+        );
+        
+        const entitiesTable = [];
+        entitiesTable.push(
+            new TableRow({
+                children: [
+                    new TableCell({ children: [new Paragraph({ text: 'Entidad', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Tipo', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Validación', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Score', bold: true })], shading: { fill: 'e2e8f0' } })
+                ]
+            })
+        );
+        
+        document.querySelectorAll('#entitiesTable tbody tr').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 4) {
+                entitiesTable.push(
+                    new TableRow({
+                        children: [
+                            new TableCell({ children: [new Paragraph(cells[0].querySelector('input')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[1].querySelector('select')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[2].querySelector('input')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[3].querySelector('input')?.value || '')] })
+                        ]
+                    })
+                );
+            }
+        });
+        
+        if (entitiesTable.length > 1) {
+            sections.push(new Table({ rows: entitiesTable, width: { size: 100, type: 'pct' } }));
+        }
+        
+        sections.push(new PageBreak());
+        
+        sections.push(
+            new Paragraph({
+                text: '6. MATRIZ DE CHECKPOINTS (SCORING GLOBAL)',
+                heading: HeadingLevel.HEADING_1,
+                spacing: { before: 200, after: 150 },
+                border: { bottom: { color: '00b8d4', space: 1, style: BorderStyle.SINGLE, size: 6 } }
+            })
+        );
+        
+        const cpTable = [];
+        cpTable.push(
+            new TableRow({
+                children: [
+                    new TableCell({ children: [new Paragraph({ text: 'ID', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Criterio / Hito', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Etapa', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Score', bold: true })], shading: { fill: 'e2e8f0' } })
+                ]
+            })
+        );
+        
+        document.querySelectorAll('#scoring-tbody tr').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 4) {
+                cpTable.push(
+                    new TableRow({
+                        children: [
+                            new TableCell({ children: [new Paragraph(cells[0].querySelector('input')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[1].querySelector('input')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[2].querySelector('input')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[3].querySelector('input')?.value || '')] })
+                        ]
+                    })
+                );
+            }
+        });
+        
+        if (cpTable.length > 1) {
+            sections.push(new Table({ rows: cpTable, width: { size: 100, type: 'pct' } }));
+        }
+        
+        sections.push(
+            new Paragraph({ text: '', spacing: { after: 100 } }),
+            new Paragraph({
+                text: 'Nota: El Score Total = Suma(Entity Scores) + Suma(Response Scores) + Suma(Checkpoint Scores)',
+                italics: true,
+                spacing: { after: 200 }
+            })
+        );
+        
+        sections.push(new PageBreak());
+        
+        sections.push(
+            new Paragraph({
+                text: '7. LIBRERÍA Q&A DE RESPUESTAS',
+                heading: HeadingLevel.HEADING_1,
+                spacing: { before: 200, after: 150 },
+                border: { bottom: { color: '00b8d4', space: 1, style: BorderStyle.SINGLE, size: 6 } }
+            })
+        );
+        
+        const qaTable = [];
+        qaTable.push(
+            new TableRow({
+                children: [
+                    new TableCell({ children: [new Paragraph({ text: 'Pregunta', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Respuesta Esperada', bold: true })], shading: { fill: 'e2e8f0' } }),
+                    new TableCell({ children: [new Paragraph({ text: 'Score', bold: true })], shading: { fill: 'e2e8f0' } })
+                ]
+            })
+        );
+        
+        document.querySelectorAll('#qaLibraryTable tbody tr').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 3) {
+                qaTable.push(
+                    new TableRow({
+                        children: [
+                            new TableCell({ children: [new Paragraph(cells[0].querySelector('input')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[1].querySelector('input')?.value || '')] }),
+                            new TableCell({ children: [new Paragraph(cells[2].querySelector('input')?.value || '')] })
+                        ]
+                    })
+                );
+            }
+        });
+        
+        if (qaTable.length > 1) {
+            sections.push(new Table({ rows: qaTable, width: { size: 100, type: 'pct' } }));
+        }
+        
+        sections.push(new PageBreak());
+        
+        sections.push(
+            new Paragraph({
+                text: 'DOCUMENTO DE ESPECIFICACIÓN GENERADO AUTOMÁTICAMENTE',
+                alignment: AlignmentType.CENTER,
+                spacing: { before: 300, after: 50 },
+                italics: true,
+                color: '94a3b8'
+            }),
+            new Paragraph({
+                text: `Baru Rag Master v8.0 | ${timestamp}`,
+                alignment: AlignmentType.CENTER,
+                italics: true,
+                color: '94a3b8'
+            })
+        );
+        
+        const doc = new Document({
+            sections: [{
+                children: sections
+            }]
+        });
+        
+        const filename = clientName 
+            ? `Requerimientos_Funcionales_${clientName.replace(/\s+/g, '_')}.docx`.substring(0, 50)
+            : 'Requerimientos_Funcionales_RAG.docx';
+        
+        Packer.toBlob(doc).then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        });
+    }
+
+    // --- NUEVO RAG WIZARD FUNCTIONS ---
+    let wizardCurrentStep = 1;
+    let wizardMaxSteps = 3;
+    window._nuevoRAG = null;
+
+    function openNuevoRAG() {
+        wizardCurrentStep = 1;
+        document.getElementById('nuevo-rag-modal').classList.remove('hidden');
+        showWizardStep(1);
+    }
+
+    function closeNuevoRAG() {
+        document.getElementById('nuevo-rag-modal').classList.add('hidden');
+        document.getElementById('nr_user').value = '';
+        document.getElementById('nr_project').value = '';
+    }
+
+    function showWizardStep(step) {
+        document.querySelectorAll('#nuevo-rag-steps .step').forEach(s => s.classList.add('hidden'));
+        document.querySelector(`#nuevo-rag-steps .step[data-step="${step}"]`).classList.remove('hidden');
+        
+        document.getElementById('nr-prev').style.display = step > 1 ? 'inline-block' : 'none';
+        
+        if (step === wizardMaxSteps) {
+            document.getElementById('nr-next').innerHTML = '<i class="fa-solid fa-check mr-2"></i> Finalizar';
+        } else {
+            document.getElementById('nr-next').innerHTML = 'Siguiente';
+        }
+    }
+
+    function nextWizardStep() {
+        if (wizardCurrentStep === 1) {
+            const user = document.getElementById('nr_user').value.trim();
+            const project = document.getElementById('nr_project').value.trim();
+            if (!user || !project) {
+                alert('Por favor completa tu nombre y el nombre del proyecto');
+                return;
+            }
+        }
+        
+        if (wizardCurrentStep < wizardMaxSteps) {
+            wizardCurrentStep++;
+            showWizardStep(wizardCurrentStep);
+        } else {
+            finishWizard(false);
+        }
+    }
+
+    function prevWizardStep() {
+        if (wizardCurrentStep > 1) {
+            wizardCurrentStep--;
+            showWizardStep(wizardCurrentStep);
+        }
+    }
+
+    function finishWizard() {
+        const user = document.getElementById('nr_user').value.trim();
+        const project = document.getElementById('nr_project').value.trim();
+        
+        if (!user || !project) {
+            alert('Por favor completa tu nombre y el nombre del proyecto');
+            return;
+        }
+
+        window._nuevoRAG = {
+            username: user,
+            project: project,
+            timestamp: new Date().toISOString()
+        };
+
+        sessionStorage.setItem('nuevoRAG', JSON.stringify(window._nuevoRAG));
+        
+        closeNuevoRAG();
+        enableAllInteractiveFields();
+        document.getElementById('welcome-screen').style.display = 'none';
+        showSection('flow');
+    }
+
+    function disableAllInteractiveFields() {
+        document.querySelectorAll('input:not(#nr_user):not(#nr_project), textarea, select, button').forEach(el => {
+            if (!el.closest('#nuevo-rag-modal') && !el.classList.contains('no-disable')) {
+                if (el.classList.contains('nav-btn')) {
+                    el.disabled = true;
+                    el.style.opacity = '0.5';
+                    el.style.pointerEvents = 'none';
+                }
+            }
+        });
+    }
+
+    function enableAllInteractiveFields() {
+        document.querySelectorAll('input, textarea, select, button').forEach(el => {
+            el.disabled = false;
+            el.style.opacity = '1';
+            el.style.pointerEvents = 'auto';
+        });
+    }
+
+
     // --- INIT ---
     window.onload = function() {
-        // Set default values for quick start
-        document.getElementById('basePrompt').value = `Eres un Agente Setter profesional. Tu misión es calificar al lead (E1/E2) y agendar una cita (E3). NO VENDES.`;
-        document.getElementById('ragPrompt').value = `Instrucciones para el motor de respuestas. Si no encuentras información sobre un precio, di que deben consultar el sitio web, NO inventes el dato.`;
-        document.getElementById('clientName').value = "Venta de autos eléctricos BYD";
-        document.getElementById('agentName').value = "Sofía, Agente Setter";
+        initSession();
+        
+        const savedNuevoRAG = sessionStorage.getItem('nuevoRAG');
+        if (savedNuevoRAG) {
+            window._nuevoRAG = JSON.parse(savedNuevoRAG);
+        }
+
+        const basePromptEl = document.getElementById('basePrompt');
+        const ragPromptEl = document.getElementById('ragPrompt');
+        const clientNameEl = document.getElementById('clientName');
+        const agentNameEl = document.getElementById('agentName');
+        
+        const sessionData = getSessionData();
+        
+        basePromptEl.value = sessionData.basePrompt || `Eres un Agente Setter profesional. Tu misión es calificar al lead (E1/E2) y agendar una cita (E3). NO VENDES.`;
+        ragPromptEl.value = sessionData.ragPrompt || `Instrucciones para el motor de respuestas. Si no encuentras información sobre un precio, di que deben consultar el sitio web, NO inventes el dato.`;
+        clientNameEl.value = sessionData.clientName || "Venta de autos eléctricos BYD";
+        agentNameEl.value = sessionData.agentName || "Sofía, Agente Setter";
         
         renderFlow();
         renderEntities();
         renderSources();
         renderScoring();
         renderQALibrary();
-        // Disable all interactive fields until user starts Nuevo RAG
-        disableAllInteractiveFields();
-        showSection('flow'); // Start on the detailed flow section
+        
+        if (window._nuevoRAG) {
+            enableAllInteractiveFields();
+            document.getElementById('welcome-screen').style.display = 'none';
+            showSection('flow');
+        } else {
+            disableAllInteractiveFields();
+            document.getElementById('welcome-screen').style.display = 'flex';
+            showSection('flow');
+        }
     }
 </script>
 
